@@ -10,18 +10,20 @@ REQUIRED_SECRETS = ["TEXT_API_KEY", "LOG_LEVEL"]  # 新增 LOG_LEVEL 到必需�
 def load_secrets():
     """加载并校验 Secrets，显式指定 .env 路径"""
     # 移除重复导入（已在模块顶部导入 os 和 load_dotenv）
-    
+
     # 计算 .env 路径：main.py 在 app/ 目录，.env 在项目根目录
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     dotenv_path = os.path.join(project_root, ".env")
-    
+
     # 强制加载指定路径的 .env 文件
     load_dotenv(dotenv_path=dotenv_path)
-    
+
     # 校验所有必需密钥（包括 LOG_LEVEL）
     missing_secrets = [key for key in REQUIRED_SECRETS if not os.getenv(key)]
     if missing_secrets:
-        raise RuntimeError(f"缺失关键Secrets：{', '.join(missing_secrets)}（请检查.env）")
+        raise RuntimeError(
+            f"缺失关键Secrets：{', '.join(missing_secrets)}（请检查.env）"
+        )
     return {key: os.getenv(key) for key in REQUIRED_SECRETS}
 
 
