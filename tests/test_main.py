@@ -1,16 +1,15 @@
 # tests/test_main.py（优化后，基于 testing-with-docker.pdf）
-import pytest
 import os
 import sys
 
-# 确保项目根目录在 sys.path（若已通过 pytest.ini 配置可省略）
+import pytest
+
+from app.main import REQUIRED_SECRETS, count_text_stats  # 所有导入移到顶部
+
+# 确保项目根目录在 sys.path（逻辑移到导入之后）
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
-
-# 导入依赖（此时 app.main 导入时无全局 Secrets 加载）
-from app.main import count_text_stats, load_secrets, REQUIRED_SECRETS
-from dotenv import load_dotenv
 
 
 def test_count_text_stats():
