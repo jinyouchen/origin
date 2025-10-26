@@ -13,12 +13,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: |
-          pip install black ruff  # 明确安装代码检查工具
-          pip install -r requirements.txt  # 安装项目依赖
-      - run: black --check . && ruff check .  # 执行检查
-  test:  # 自动化测试
+          pip install black ruff
+          pip install -r requirements.txt
+      - run: black --check . && ruff check .
+
+  test:  # 自动化测试（需与 code-quality 同级）
     needs: code-quality
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,8 +28,10 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: echo "TEXT_API_KEY=${{ secrets.TEXT_API_KEY }}" > .env
+      - run: cat .env  # 验证 .env 内容
       - run: pytest tests/test_main.py -v
-  docker-build:  # 容器构建
+
+  docker-build:  # 容器构建（需与 code-quality 同级）
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -37,4 +41,4 @@ jobs:
         with:
           context: .
           push: false
-          tags: text-stat-app:latest  # 确保此处无语法错误（如多余字符）
+          tags: text-stat-app:latest
