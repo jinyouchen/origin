@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 88  # 由 black 管理行长度，保持这一行
+target-version = ["py310", "py311"]
+
+[tool.ruff]
+# 这里无需额外配置
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "W", "I"]  # 保留检查规则
+exclude = [".git", "venv"]  # 保留排除目录
+# 删除 line-length = 88 这一行
