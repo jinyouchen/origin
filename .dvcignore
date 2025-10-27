@@ -1,0 +1,6 @@
+# .dvcignore（参考14-DVC.pdf“Data Versioning Best Practices”）
+.git/
+.venv/
+mlruns/
+*.log
+.env

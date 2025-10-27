@@ -1,0 +1,8 @@
+# params.yaml（参考14-DVC.pdf“Pipelines Parameters”与15-MLFlow.pdf“Param Tracking”）
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+model:
+  experiment_name: "text-stat-experiments"  # MLFlow实验名
+  max_features: 1000  # 模型参数（如TF-IDF最大特征数）
+  ngram_range: [1, 2]
