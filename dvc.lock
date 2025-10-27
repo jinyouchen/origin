@@ -1,0 +1,20 @@
+schema: '2.0'
+stages:
+  process_data:
+    cmd: python app/data_processing.py --input data/raw --output data/processed
+    deps:
+    - path: app/data_processing.py
+      hash: md5
+      md5: 1b6082f46f91b6d0bd9bfef1661660a8
+      size: 2134
+    - path: data/raw
+      hash: md5
+      md5: 1904ae8641214cf7603154e2da09599b.dir
+      size: 398620
+      nfiles: 5
+    outs:
+    - path: data/processed/
+      hash: md5
+      md5: 47ed38635f7425ca4431e482796ab574.dir
+      size: 7154
+      nfiles: 2

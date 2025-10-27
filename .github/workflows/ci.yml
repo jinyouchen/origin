@@ -1,9 +1,10 @@
 name: Text-Stat CI/CD
 on:
   push:
-    branches: [main]
+    branches: [main, dev]  # 支持 main 和 dev 分支推送触发
   pull_request:
-    branches: [main]
+    branches: [main, dev]  # 支持针对 main 和 dev 分支的 PR 触发
+
 jobs:
   code-quality:  # 代码质量检查
     runs-on: ubuntu-latest
@@ -12,12 +13,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: 缓存 pip 依赖
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - run: |
           pip install black ruff
           pip install -r requirements.txt
       - run: black --check . && ruff check .
 
-  test:  # 自动化测试（需与 code-quality 同级）
+  test:  # 自动化测试
     needs: code-quality
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
@@ -26,19 +34,33 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: 缓存 pip 依赖
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - run: pip install -r requirements.txt
       - run: echo "TEXT_API_KEY=${{ secrets.TEXT_API_KEY }}" > .env
       - run: cat .env  # 验证 .env 内容
-      - run: pytest tests/test_main.py -v
+      - run: pytest tests/ -v  # 测试整个 tests 目录
 
-  docker-build:  # 容器构建（需与 code-quality 同级）
+  docker-build:  # 容器构建与推送
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
+      - name: 登录 Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
-          tags: text-stat-app:latest
+          push: true  # 开启镜像推送
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/text-stat-app:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/text-stat-app:${{ github.sha }}

@@ -1,0 +1,12 @@
+vars:
+  - params.yaml  # 引用外部参数
+
+stages:
+  process_data:
+    # 补充 --output 参数，值为 DVC 跟踪的输出目录
+    cmd: python app/data_processing.py --input ${data.raw_dir} --output data/processed
+    deps:
+      - app/data_processing.py
+      - ${data.raw_dir}
+    outs:
+      - data/processed/  # 与 --output 路径保持一致
