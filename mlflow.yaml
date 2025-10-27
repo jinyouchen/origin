@@ -1,0 +1,3 @@
+# mlflow.yaml（参考15-MLFlow.pdf“Remote Tracking”）
+tracking_uri: "./mlruns"  # 本地跟踪（生产环境可改为远程URI如Dagshub）
+experiment_name: "text-stat-experiments"
